@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quotes API — Frontend</title>
+<style>
+body { font-family: Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; background:#f6f8fb; }
+.card { background:#fff; padding:24px; border-radius:12px; box-shadow:0 6px 18px rgba(20,20,50,0.06); max-width:600px; width:92%; text-align:center; }
+h1 { margin:0 0 12px 0; font-size:20px; }
+p.quote { font-size:18px; margin:20px 0; min-height:54px; }
+button { padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+.btn-primary { background:#2563eb; color:white; }
+.btn-secondary { background:#e5e7eb; color:#111827; margin-left:8px; }
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Random Motivational Quote</h1>
+<p class="quote" id="quote">Click the button to get a quote</p>
+<div>
+<button class="btn-primary" id="fetchBtn">Get Quote</button>
+<button class="btn-secondary" id="copyBtn">Copy</button>
+</div>
+<p style="font-size:12px;color:#6b7280;margin-top:12px;">Powered by Quotes API — <code>/quote</code></p>
+</div>
+
+
+<script>
+const qEl = document.getElementById('quote');
+const fetchBtn = document.getElementById('fetchBtn');
+const copyBtn = document.getElementById('copyBtn');
+
+
+async function getQuote() {
+  try {
+    fetchBtn.disabled = true;
+    fetchBtn.textContent = 'Loading...';
+    const res = await fetch('/quote');
+    if (!res.ok) throw new Error('Network response not ok');
+    const data = await res.json();
+    qEl.textContent = data.quote;
+  } catch (err) {
+    qEl.textContent = 'Failed to fetch — try again.';
+    console.error(err);
+  } finally {
+    fetchBtn.disabled = false;
+    fetchBtn.textContent = 'Get Quote';
+  }
+}
+
+
+fetchBtn.addEventListener('click', getQuote);
+
+
+copyBtn.addEventListener('click', () => {
+  const text = qEl.textContent || '';
+  if (!text) return;
+  navigator.clipboard?.writeText(text)
+    .then(() => {
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
+    })
+    .catch(() => {
+      copyBtn.textContent = 'Failed';
+    });
+});
+</script>
+</body>
+</html>
